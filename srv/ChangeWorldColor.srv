@@ -1,0 +1,6 @@
+string world_file # Name of .world file
+string name  # Name of the target you want to change
+float64[] ambient
+---
+bool success  # True if the color change is successful, False otherwise
+

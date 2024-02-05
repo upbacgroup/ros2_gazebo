@@ -1,0 +1,9 @@
+string name  # Name of the target you want to change
+float64[] ambient
+float64[] diffuse
+float64[] specular
+float64[] emissive
+---
+bool success  # True if the color change is successful, False otherwise
+string reason  # Reason for failure if any
+
