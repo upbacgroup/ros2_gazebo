@@ -9,14 +9,11 @@
   <xacro:property name="frame_mass" value="0.88"/>
   <xacro:property name="arm_radius" value="0.01"/>
   <xacro:property name="arm_length" value="0.15"/>
-  <xacro:property name="arm_mass" value="0.0001"/>
+  <xacro:property name="arm_mass" value="0.01"/>
   <xacro:property name="propeller_radius" value="0.1"/>
   <xacro:property name="propeller_height" value="0.01"/>
   <xacro:property name="propeller_height_offset" value="0.025"/>
-  <xacro:property name="propeller_mass" value="0.0001"/>
-  <xacro:property name="link_name" value="camera_link"/>
-  <xacro:property name="camera_name" value="depth_camera"/>
-
+  <xacro:property name="propeller_mass" value="0.01"/>
 
 <xacro:macro name="cylinder_inertial" params="radius height mass *origin">
   <inertial>
@@ -42,47 +39,62 @@
     </geometry>
     <material name="frame_material"/>
   </visual>
-
   <collision>
     <origin xyz="0 0 1" rpy="0 0 0"/>
     <geometry>
       <cylinder radius="${frame_radius}" length="${frame_height}"/>
     </geometry>
   </collision>
-
   <xacro:cylinder_inertial radius="${frame_radius}" height="${frame_height}" mass="${frame_mass}">
     <origin xyz="0 0 1" rpy="0 0 0" />
   </xacro:cylinder_inertial>
 </link>
 
-
-<link name="${link_name}">
+<link name="camera_link">
+<!-- <inertial>
+        <mass>0.1</mass>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.073000 0.276000 0.072000</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://kinect/meshes/kinect.dae</uri>
+          </mesh>
+        </geometry>
+      </visual> -->
   <visual>
-  <origin xyz="0 0 1.05" rpy="0 0 -1.5708"/>
+  <origin xyz="0 0 1.0" rpy="0 0 -1.5708"/>
     <geometry>
       <box size="0.05 0.05 0.05"/>
     </geometry>
-  </visual>
-  <collision>
+  </visual> 
+ <collision>
     <geometry>
       <box size="0.05 0.05 0.05"/>
     </geometry>
   </collision>
   <inertial>
     <mass value="0.0000000001"/>
-    <origin rpy="0 0 0" xyz="0 0 1.05"/>
+    <origin rpy="0 0 0" xyz="0 0 1.0"/>
     <inertia ixx="0.000001" ixy="0.000001" ixz="0.000001" iyy="0.000001" iyz="0.000001" izz="0.000001"/>
-  </inertial>
+  </inertial> 
   <material name="camera_material"/>
 </link>
 
 <joint name="camera_joint" type="fixed">
   <parent link="drone"/>
   <child link="camera_link"/>
-  <origin xyz="0 0 0.05" rpy="0 0 0"/>
+  <origin xyz="0 0 0.2" rpy="0 0 0"/>
   <axis xyz="1 0 0"/>
   <limit lower="-3.14159" upper="3.14159" effort="10" velocity="3.14159"/>
 </joint>
+
   
 <xacro:macro name="arm" params="i">
   <link name="arm${i}">
@@ -147,10 +159,6 @@
 
 
 
-
-
-
-
 <!-- Xacro -->
 <xacro:arm i="1"/>
 <xacro:arm i="2"/>
@@ -173,6 +181,11 @@
   <material>Gazebo/Orange</material>
 </gazebo>
 
+
+<gazebo reference="depth_camera">
+  <material>Gazebo/Yellow</material>
+</gazebo>
+
 <material name="frame_material">
   <color rgba="1 0.8 0.8 1"/>
 </material>
@@ -186,9 +199,8 @@
 </material>
 
 <material name="camera_material">
-  <color rgba="0.3 0 0.3 0.6"/>
+  <color rgba="1 0 0 0.6"/>
 </material>
-
 
 
 
@@ -197,7 +209,7 @@
 <!-- Z Controller -->
 <gazebo>
     <plugin name="drone_plugin" filename="libdrone_plugin.so">
-      <updateRate>100</updateRate>
+      <updateRate>20</updateRate>
     </plugin>
   </gazebo>
 
@@ -213,47 +225,99 @@
   </plugin>
 </gazebo>
 
-<!-- Depth Camera -->
-<gazebo reference="${link_name}">
-  <sensor name="${link_name}_camera" type="depth">
-    <update_rate>20</update_rate>
-    <camera>
-      <horizontal_fov>1.047198</horizontal_fov>
-      <image>
-        <width>640</width>
-        <height>480</height>
-        <format>R8G8B8</format>
-      </image>
-      <clip>
-        <near>0.05</near>
-        <far>3</far>
-      </clip>
-    </camera>
-    <plugin name="${link_name}_controller" filename="libgazebo_ros_openni_kinect.so">
-      <baseline>0.2</baseline>
-      <alwaysOn>true</alwaysOn>
-      <updateRate>1.0</updateRate>
-      <cameraName>${camera_name}_ir</cameraName>
-      <imageTopicName>/${camera_name}/color/image_raw</imageTopicName>
-      <cameraInfoTopicName>/${camera_name}/color/camera_info</cameraInfoTopicName>
-      <depthImageTopicName>/${camera_name}/depth/image_raw</depthImageTopicName>
-      <depthImageInfoTopicName>/${camera_name}/depth/camera_info</depthImageInfoTopicName>
-      <pointCloudTopicName>/${camera_name}/depth/points</pointCloudTopicName>
-      <frameName>drone</frameName>
-      <pointCloudCutoff>0.5</pointCloudCutoff>
-      <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
-      <distortionK1>0.00000001</distortionK1>
-      <distortionK2>0.00000001</distortionK2>
-      <distortionK3>0.00000001</distortionK3>
-      <distortionT1>0.00000001</distortionT1>
-      <distortionT2>0.00000001</distortionT2>
-      <CxPrime>0</CxPrime>
-      <Cx>0</Cx>
-      <Cy>0</Cy>
-      <focalLength>0</focalLength>
-      <hackBaseline>0</hackBaseline>
+ <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+     <!-- <robotNamespace>/robot</robotNamespace> -->
+      <legacyModeNS>true</legacyModeNS>
     </plugin>
-  </sensor>
-</gazebo>
+  </gazebo>
+
+
+  <gazebo reference="camera_link">
+   <sensor name="camera" type="depth">
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.047198</horizontal_fov>
+          <image>
+            <width>80</width>
+            <height>60</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>3</far>
+          </clip>
+        </camera>
+         <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+          <baseline>0.2</baseline>
+          <alwaysOn>true</alwaysOn>
+          <!-- Keep this zero, update_rate in the parent <sensor> tag
+            will control the frame rate. -->
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_ir</cameraName>
+          <imageTopicName>/camera/color/image_raw</imageTopicName>
+          <cameraInfoTopicName>/camera/color/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
+          <depthImageCameraInfoTopicName>/camera/depth/camera_info</depthImageCameraInfoTopicName>
+          <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
+          <frameName>camera_link</frameName>
+          <pointCloudCutoff>0.5</pointCloudCutoff>
+          <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+          <distortionK1>0</distortionK1>
+          <distortionK2>0</distortionK2>
+          <distortionK3>0</distortionK3>
+          <distortionT1>0</distortionT1>
+          <distortionT2>0</distortionT2>
+          <CxPrime>0</CxPrime>
+          <Cx>0</Cx>
+          <Cy>0</Cy>
+          <focalLength>0</focalLength>
+          <hackBaseline>0</hackBaseline>
+        </plugin>
+      </sensor>
+      </gazebo> 
+
+  <!-- camera -->
+  <gazebo reference="camera_link">
+    <sensor type="camera" name="camera1">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>robot/camera1</cameraName>
+        <imageTopicName>/robot/camera1/image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
 
 </robot>

@@ -22,16 +22,10 @@
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description"
-    command="$(find xacro)/xacro '$(find air_drone)/urdf/drone.urdf.xacro'"/>  
-
-  <!-- load the drone description onto the ROS parameter server -->
-  <!--param name="robot_description" textfile="$(find air_drone)/urdf/drone.urdf"/-->  
-
-  <!-- <node name="ddpg" pkg="air_drone" type="ddpg.py" output="screen"/>  -->
+    command="$(find xacro)/xacro --inorder '$(find air_drone)/urdf/drone.urdf.xacro'"/>  
 
 <node name="drone_env" pkg="air_drone" type="drone_env.py" output="screen"/>
-<!-- <node name="camera_node" pkg="air_drone" type="camera.py" output="screen"/> -->
-<!-- <node name="target_points" pkg="air_drone" type="target_points.py" output="screen"/> -->
+<!-- <node name="keyboard_teleop" pkg="air_drone" type="checker.py" output="screen"/> -->
 
 
 <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" 

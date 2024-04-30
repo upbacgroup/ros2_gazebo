@@ -5,10 +5,9 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /TF1
+        - /TF1/Status1
         - /TF1/Tree1
         - /Image1
-        - /PointCloud21
       Splitter Ratio: 0.45278969407081604
     Tree Height: 355
   - Class: rviz/Selection
@@ -28,7 +27,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -94,12 +93,17 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         drone:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        kinect:
+        hokuyo_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -147,36 +151,10 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        arm1:
-          Value: false
-        arm2:
-          Value: false
-        arm3:
-          Value: false
-        arm4:
-          Value: false
-        arm5:
-          Value: false
-        arm6:
-          Value: false
         drone:
           Value: false
-        kinect:
-          Value: true
         odom:
           Value: true
-        propeller1:
-          Value: false
-        propeller2:
-          Value: false
-        propeller3:
-          Value: false
-        propeller4:
-          Value: false
-        propeller5:
-          Value: false
-        propeller6:
-          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -184,28 +162,10 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
+        drone:
+          {}
         odom:
-          drone:
-            arm1:
-              propeller1:
-                {}
-            arm2:
-              propeller2:
-                {}
-            arm3:
-              propeller3:
-                {}
-            arm4:
-              propeller4:
-                {}
-            arm5:
-              propeller5:
-                {}
-            arm6:
-              propeller6:
-                {}
-            kinect:
-              {}
+          {}
       Update Interval: 0
       Value: true
     - Class: rviz/Marker
@@ -256,34 +216,6 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: RGB8
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Flat Squares
-      Topic: /depth_camera/depth/points
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -320,17 +252,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.31322193145751953
-        Y: 0.05554088577628136
-        Z: 0.3876053988933563
+        X: -0.6006946563720703
+        Y: 0.449040025472641
+        Z: 0.1526898443698883
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6303979754447937
+      Pitch: 0.4053982198238373
       Target Frame: <Fixed Frame>
-      Yaw: 0.9903978109359741
+      Yaw: 1.4403973817825317
     Saved: ~
 Window Geometry:
   Displays:
