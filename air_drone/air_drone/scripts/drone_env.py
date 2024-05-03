@@ -1,10 +1,10 @@
 
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose
 from sensor_msgs.msg import Image
 from std_srvs.srv import Empty
-# from air_drone.msg import Position
+
 from cv_bridge import CvBridge
 import gym
 from gym import Env
@@ -22,7 +22,7 @@ VERBOSE = False
 class DroneEnv(Node, Env):
     def __init__(self):
         super().__init__('drone_env')
-
+        print('**********************')
         self.width = 80
         self.height = 60
         
@@ -41,15 +41,16 @@ class DroneEnv(Node, Env):
         self.action_space = gym.spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float32)
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(60,80,1), dtype=np.uint8)
 
-        # self.current_pose_sub = self.create_subscription(Position, 'pose', self.position_callback)
-        # self.image_sub = self.create_subscription(Image, '/camera/depth/image_raw', self.camera_callback)
-        self.speed_motors_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.current_pose_sub = self.create_subscription(Pose, '~/gt_pose', self.position_callback, 1024)
+       
+        self.image_sub = self.create_subscription(Image, '~/front/image_raw', self.camera_callback, 1024)
+        
+        self.speed_motors_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.reset_simulation_service = self.create_client(Empty, '/gazebo/reset_simulation')
-        # self.image_sub = self.create_subscription(Image, '/camera/color/image_raw', self.image_callback)
-
-    def image_callback(self, data):
-        cv_image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
-    
+        
+    def camera_callback(self, image_msg):
+        # Process image message
+        cv_image = self.bridge.imgmsg_to_cv2(image_msg, 'bgr8')
         # Convert BGR to HSV
         hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
@@ -61,12 +62,11 @@ class DroneEnv(Node, Env):
         mask = cv2.inRange(hsv_image, lower_green, upper_green)
 
         num_green_pixels = cv2.countNonZero(mask)
-    
+
         self.green_pixels = num_green_pixels 
 
         # Find contours
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
 
         # Filter contours based on size and shape
         min_contour_area = 100
@@ -74,19 +74,13 @@ class DroneEnv(Node, Env):
             area = cv2.contourArea(contour)
             if area > min_contour_area:
                 # Draw bounding box around detected green objects
-                # print("**************GREEN BALL********************")
                 x, y, w, h = cv2.boundingRect(contour)
-                self.ball_coords = (x,y)
+                self.ball_coords = (x, y)
                 current_position_xy = tuple(self.current_position[:2]) 
                 self.dist = np.linalg.norm(np.array(current_position_xy) - np.array(self.ball_coords))
-                # print(self.dist)
                 cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 0), -1)
-                
-        # Display the result
-        cv2.imshow('Green Ball Detection', cv_image)
-        cv2.waitKey(1)
 
-    def camera_callback(self, image_msg):
+        # Process depth image (assuming it's part of the image message)
         image = self.bridge.imgmsg_to_cv2(image_msg, desired_encoding='passthrough')
         
         if image.size > 0:
@@ -100,6 +94,66 @@ class DroneEnv(Node, Env):
             non_zero_mask = (depth_array != 0)
             if np.any(non_zero_mask):
                 self.min_non_zero_distance = np.min(depth_array[non_zero_mask])
+
+        # Display the result
+        cv2.imshow('Green Ball Detection', cv_image)
+        cv2.waitKey(1)
+
+
+
+    # def image_callback(self, data):
+    #     cv_image = self.bridge.imgmsg_to_cv2(data, 'bgr8')
+    
+    #     # Convert BGR to HSV
+    #     hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+
+    #     # Define range of green color in HSV
+    #     lower_green = np.array([40, 40, 40])
+    #     upper_green = np.array([80, 255, 255])
+
+    #     # Threshold the HSV image to get only green colors
+    #     mask = cv2.inRange(hsv_image, lower_green, upper_green)
+
+    #     num_green_pixels = cv2.countNonZero(mask)
+    
+    #     self.green_pixels = num_green_pixels 
+
+    #     # Find contours
+    #     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+
+    #     # Filter contours based on size and shape
+    #     min_contour_area = 100
+    #     for contour in contours:
+    #         area = cv2.contourArea(contour)
+    #         if area > min_contour_area:
+    #             # Draw bounding box around detected green objects
+    #             # print("**************GREEN BALL********************")
+    #             x, y, w, h = cv2.boundingRect(contour)
+    #             self.ball_coords = (x,y)
+    #             current_position_xy = tuple(self.current_position[:2]) 
+    #             self.dist = np.linalg.norm(np.array(current_position_xy) - np.array(self.ball_coords))
+    #             # print(self.dist)
+    #             cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 0), -1)
+                
+    #     # Display the result
+    #     cv2.imshow('Green Ball Detection', cv_image)
+    #     cv2.waitKey(1)
+
+    # def camera_callback(self, image_msg):
+    #     image = self.bridge.imgmsg_to_cv2(image_msg, desired_encoding='passthrough')
+        
+    #     if image.size > 0:
+    #         image = np.nan_to_num(image)
+    #         resized_depth_image = np.expand_dims(image, axis=-1)
+    #         # Convert resized depth image to float32
+    #         self.depth_image = np.array(resized_depth_image, dtype=np.float32)
+
+    #         depth_array = np.array(self.depth_image, dtype=np.float32)
+
+    #         non_zero_mask = (depth_array != 0)
+    #         if np.any(non_zero_mask):
+    #             self.min_non_zero_distance = np.min(depth_array[non_zero_mask])
 
     def position_callback(self, pos_msg):
         pose_x, pose_y, pose_z = pos_msg.x, pos_msg.y, pos_msg.z
