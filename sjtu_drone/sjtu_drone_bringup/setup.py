@@ -26,6 +26,10 @@ setup(
     entry_points={
         'console_scripts': [
             'spawn_drone = sjtu_drone_bringup.spawn_drone:main',
+            # 'training_node = sjtu_drone_bringup.training_node:main',
+            'spawn_entities = sjtu_drone_bringup.spawn_entities:main',
+            'delete_entities = sjtu_drone_bringup.delete_entites:main',
+            'drone_env = sjtu_drone_bringup.drone_env:main',
         ],
     },
 )

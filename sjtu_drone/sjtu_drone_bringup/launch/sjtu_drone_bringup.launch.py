@@ -47,7 +47,7 @@ def get_teleop_controller(context, *_, **kwargs) -> Node:
 
 def generate_launch_description():
     sjtu_drone_bringup_path = get_package_share_directory('sjtu_drone_bringup')
-    
+
     rviz_path = os.path.join(
         sjtu_drone_bringup_path, "rviz", "rviz.rviz"
     )
@@ -70,32 +70,65 @@ def generate_launch_description():
             description="Type of controller: keyboard (default) or joystick",
         ),
 
-        Node(
-            package="rviz2",
-            executable="rviz2",
-            name="rviz2",
-            arguments=[
-                "-d", rviz_path
-            ],
-            output="screen",
-        ),
+        # Node(
+        #     package="rviz2",
+        #     executable="rviz2",
+        #     name="rviz2",
+        #     arguments=[
+        #         "-d", rviz_path
+        #     ],
+        #     output="screen",
+        # ),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(sjtu_drone_bringup_path, 'launch', 'sjtu_drone_gazebo.launch.py')
             )
         ),
+        
+        # Node(
+        #     package='joy',
+        #     executable='joy_node',
+        #     name='joy',
+        #     namespace=model_ns,
+        #     output='screen',
+        # ),
 
-        Node(
-            package='joy',
-            executable='joy_node',
-            name='joy',
-            namespace=model_ns,
-            output='screen',
-        ),
+        # OpaqueFunction(
+        #     function=get_teleop_controller,
+        #     kwargs={'model_ns': model_ns},
+        # ),
 
-        OpaqueFunction(
-            function=get_teleop_controller,
-            kwargs={'model_ns': model_ns},
-        ),
+
+        # Node(
+        #     package='sjtu_drone_bringup',
+        #     executable='training_node',
+        #     name='training_node',
+        #     output='screen',
+        #     prefix='gnome-terminal -- bash -c',
+        # ),
+
+        # Node(
+        #     package='sjtu_drone_bringup',
+        #     executable='drone_env',
+        #     name='drone_env',
+        #     output='screen',
+        #     # prefix='gnome-terminal -- bash -c',
+        # ),
+
+        # Node(
+        #     package='sjtu_drone_bringup',
+        #     executable='spawn_entities',
+        #     name='spawn_entities',
+        #     output='screen',
+        # ),
+
+        # Node(
+        #     package='sjtu_drone_bringup',
+        #     executable='target_points',
+        #     name='target_points',
+        #     output='screen',
+        # ),
+
+        
     ])

@@ -1,6 +1,6 @@
 import rclpy
 
-from drone_utils.drone_object import DroneObject
+from drone_object import DroneObject
 
 class DronePositionControl(DroneObject):
     def __init__(self):

@@ -3,6 +3,7 @@
 <!-- https://answers.ros.org/question/379014/passing-outside-parameters-into-urdf-file-using-xacro/ -->
   <!-- Need argument to get from launch file -->
   <xacro:arg name="params_path" default="$(find sjtu_drone_bringup)/config/drone.yaml"/> 
+ 
 
   <!-- Need seperate property for xacro inorder processing -->
   <xacro:property name="params_path" value="$(arg params_path)"/> 
@@ -41,6 +42,7 @@
       </geometry>
     </visual>
   </link>
+
 
   <joint name="sonar_joint" type="fixed">
     <parent link="base_link" />
@@ -194,8 +196,8 @@
       <camera>
         <horizontal_fov>2.09</horizontal_fov>
         <image>
-          <width>640</width>
-          <height>360</height>
+          <width>80</width>
+          <height>45</height>
           <format>R8G8B8</format>
         </image>
         <clip>

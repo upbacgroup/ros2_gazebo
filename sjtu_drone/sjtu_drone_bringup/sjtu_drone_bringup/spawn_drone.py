@@ -17,6 +17,7 @@
 import sys
 import rclpy
 from gazebo_msgs.srv import SpawnEntity
+from geometry_msgs.msg import Pose
 
 
 def main(args=None):

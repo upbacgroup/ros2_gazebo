@@ -50,16 +50,11 @@ def generate_launch_description():
         model_ns = yaml_dict["namespace"] #+ "/"
     print("namespace: ", model_ns)
 
-    print('**********************************************')
-    world_file = os.path.join('/home/ei_admin/ros2_ws/src/sjtu_drone/sjtu_drone_description',
-        "worlds", "playground_test.world"
-    )
 
-    # world_file = os.path.join(
-    #     get_package_share_directory("sjtu_drone_description"),
-    #     "worlds", "playground.world"
-    # )
-    
+    world_file = os.path.join(
+        get_package_share_directory("sjtu_drone_description"),
+        "worlds", "env_and_balls.world"
+    )
 
     def launch_gzclient(context, *args, **kwargs):
         if context.launch_configurations.get('use_gui') == 'true':
