@@ -1,21 +1,14 @@
-from stable_baselines3 import PPO, DDPG, TD3, A2C, SAC
+from stable_baselines3 import PPO, DDPG, TD3, DDPG, SAC
 import os
 from drone_env import DroneEnv
 import time
 import tensorflow as tf
 from stable_baselines3.common.noise import NormalActionNoise
 import numpy as np
-
-
+import torch as th
 
 models_dir = f"models/{int(time.time())}/"
 logdir = f"logs/{int(time.time())}/"
-
-# saved_model_path = "path/to/your/saved_model.zip"
-
-# def load_model(model_path, env):
-#     return PPO.load(model_path, env=env)
-
 
 
 if not os.path.exists(models_dir):
@@ -44,22 +37,43 @@ if gpus:
 
 
 n_actions = env.action_space.shape[-1]
-action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.5 * np.ones(n_actions))
+action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.2 * np.ones(n_actions))
+
+
+TIMESTEPS = int(1e7)
+SAVE_INTERVAL = int(1e5)
+
+
+model = DDPG("CnnPolicy", env, verbose=1, action_noise=action_noise, learning_rate=1e-5, gamma = 0.99, tensorboard_log=logdir)
+
+for i in range(0, TIMESTEPS, SAVE_INTERVAL):
+    model.learn(total_timesteps=SAVE_INTERVAL, reset_num_timesteps=False, tb_log_name="DDPG")
+    model.save(f"{models_dir}/DDPG_{i + SAVE_INTERVAL}")
+
+# Final save to ensure the last model is saved
+model.save(f"{models_dir}/DDPG_final")
+env.close()
+
+
+# del model # remove to demonstrate saving and loading
+
+# model = DDPG.load("/home/ei_admin/ros2_ws/src/sjtu_drone/sjtu_drone_bringup/sjtu_drone_bringup/models/1716995850/DDPG_400000")
+
+# obs = env.reset()
+# while True:
+#     action, _states = model.predict(obs)
+#     obs, rewards, dones, info = env.step(action)
+
+#     if dones:
+#          obs = env.reset()
 
 
 
 
-# model = A2C("CnnPolicy", env, learning_rate = 0.001, gamma = 0.95, use_rms_prop=False, verbose=1, tensorboard_log=logdir)
-# model = PPO("CnnPolicy", env, verbose=1, learning_rate=1e-6, gamma = 0.95,  tensorboard_log=logdir)
-model = DDPG("CnnPolicy", env, verbose=1, action_noise=action_noise, learning_rate=1e-7, gamma = 0.95,  tensorboard_log=logdir)
- 
 
-TIMESTEPS = 1e6
-MAX_ITERS = 1e7  # Number of iterations
-iters = 0
 
-model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name=f"DDPG")
-
+# MAX_ITERS = 1e7  # Number of iterations
+# iters = 0
 # while iters < MAX_ITERS:
 #     iters += 1
 #     print(f"Starting iteration {iters} out of {MAX_ITERS}")

@@ -17,7 +17,11 @@
 import sys
 import rclpy
 from gazebo_msgs.srv import SpawnEntity
+from std_srvs.srv import Empty as EmptyDrone
 from geometry_msgs.msg import Pose
+from rclpy.node import Node
+import random
+
 
 
 def main(args=None):
@@ -33,6 +37,9 @@ def main(args=None):
     req.xml = content
     req.robot_namespace = namespace
     req.reference_frame = "world"
+
+    req.initial_pose.position.x = random.uniform(-2,2)
+    req.initial_pose.position.x = random.uniform(-4,4)
 
     while not cli.wait_for_service(timeout_sec=1.0):
         node.get_logger().info('service not available, waiting again...')

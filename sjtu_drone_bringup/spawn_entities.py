@@ -29,8 +29,8 @@ class SpawnEntityClient(Node):
             # Generate random positions for each ball
             random_position = np.random.uniform(-5, 5, size=3)
             pose = Pose()
-            pose.position.x = np.random.uniform(1, 6)
-            pose.position.y = np.random.uniform(-2, 2)
+            pose.position.x = np.random.uniform(-5, 5)
+            pose.position.y = np.random.uniform(-5, 5)
             #pose.position.x = 4.0
             #pose.position.y = 0.0
             pose.position.z = 1.0
